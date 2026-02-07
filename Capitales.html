@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Capitales - IES Lucus Solís</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Caveat:wght@700&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #dbeafe 100%);
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
+        .logo-img {
+            max-width: 180px;
+            height: auto;
+            margin: 0 auto 20px;
+        }
+
+        /* Contenedor para el nombre en el diploma final */
+        .master-content-container {
+            position: absolute;
+            top: 70%; 
+            left: 50.5%;
+            transform: translate(-50%, -50%) rotate(-1.5deg);
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            gap: 4px;
+        }
+
+        .master-name {
+            font-family: 'Caveat', cursive;
+            width: 100%;
+            text-align: center;
+            line-height: 1;
+            color: #1e3a8a;
+            filter: drop-shadow(1px 1px 1px rgba(255,255,255,0.5));
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .master-continent-tag {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            width: 100%;
+            text-align: center;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.2;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <!-- PANTALLA 1: REGISTRO -->
+    <div id="welcome-screen" class="glass p-10 w-full max-w-md text-center">
+        <img src="https://blogsaverroes.juntadeandalucia.es/ieslucussolis/files/2023/09/Lucus-logo_clipdrop-background-removal-1024x1024.png" alt="Logo IES Lucus Solís" class="logo-img">
+        <h1 class="text-3xl font-bold text-blue-900 mb-1">Países y capitales</h1>
+        <p class="text-slate-500 mb-8 font-medium">Departamento de Geografía e Historia</p>
+        
+        <div class="text-left mb-6">
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">Nombre del Alumno/a</label>
+            <input type="text" id="student-name" placeholder="Escribe aquí tu nombre..." 
+                class="w-full p-4 border-2 border-slate-100 rounded-xl focus:border-blue-500 outline-none text-lg transition-all">
+        </div>
+        
+        <button onclick="startApp()" 
+            class="w-full bg-blue-700 text-white font-bold py-4 rounded-xl hover:bg-blue-800 transition-all text-lg shadow-lg">
+            Empezar
+        </button>
+    </div>
+
+    <!-- PANTALLA 2: SELECCIÓN -->
+    <div id="selection-screen" class="hidden glass p-10 w-full max-w-3xl text-center">
+        <img src="https://blogsaverroes.juntadeandalucia.es/ieslucussolis/files/2023/09/Lucus-logo_clipdrop-background-removal-1024x1024.png" alt="Logo" class="w-16 mx-auto mb-4">
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Preparado/a, <span id="display-name" class="text-blue-700"></span></h2>
+        <p class="text-slate-500 mb-6">Selecciona el continente para examinarte:</p>
+        
+        <div class="mb-8 flex justify-center gap-2" id="master-progress-dots"></div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <button id="btn-Europa" onclick="startGame('Europa')" class="p-6 bg-white rounded-2xl border-2 border-slate-100 text-blue-700 font-bold text-xl hover:shadow-md transition-all relative">Europa 🇪🇺</button>
+            <button id="btn-América" onclick="startGame('América')" class="p-6 bg-white rounded-2xl border-2 border-slate-100 text-emerald-700 font-bold text-xl hover:shadow-md transition-all relative">América 🌎</button>
+            <button id="btn-África" onclick="startGame('África')" class="p-6 bg-white rounded-2xl border-2 border-slate-100 text-amber-700 font-bold text-xl hover:shadow-md transition-all relative">África 🌍</button>
+            <button id="btn-Asia" onclick="startGame('Asia')" class="p-6 bg-white rounded-2xl border-2 border-slate-100 text-rose-700 font-bold text-xl hover:shadow-md transition-all relative">Asia 🌏</button>
+            <button id="btn-Oceanía" onclick="startGame('Oceanía')" class="p-6 bg-white rounded-2xl border-2 border-slate-100 text-purple-700 font-bold text-xl hover:shadow-md transition-all relative">Oceanía 🏝️</button>
+            <button onclick="showWelcome()" class="p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 text-slate-400 font-bold italic text-sm">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: JUEGO -->
+    <div id="game-screen" class="hidden glass p-8 w-full max-w-2xl">
+        <div class="flex justify-between items-start mb-8">
+            <div class="flex items-center gap-4">
+                <img src="https://blogsaverroes.juntadeandalucia.es/ieslucussolis/files/2023/09/Lucus-logo_clipdrop-background-removal-1024x1024.png" alt="Logo" class="w-10">
+                <div>
+                    <span id="game-continent" class="text-xs font-black uppercase tracking-widest text-blue-500">CONTINENTE</span>
+                    <div id="progress-text" class="text-sm font-bold text-slate-700">Pregunta 1 / --</div>
+                </div>
+            </div>
+            <div class="bg-blue-700 text-white px-5 py-2 rounded-2xl shadow-inner text-center">
+                <div class="text-[10px] uppercase font-bold opacity-80">Aciertos</div>
+                <div id="score" class="text-xl font-black">0</div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-10">
+            <h3 id="country-display" class="text-5xl font-bold text-slate-900 leading-tight">País</h3>
+        </div>
+
+        <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        <div id="feedback" class="mt-8 p-4 rounded-xl text-center font-bold text-lg hidden"></div>
+    </div>
+
+    <!-- PANTALLA 4: RESULTADO FINAL -->
+    <div id="final-screen" class="hidden glass p-12 w-full max-w-md text-center">
+        <img src="https://blogsaverroes.juntadeandalucia.es/ieslucussolis/files/2023/09/Lucus-logo_clipdrop-background-removal-1024x1024.png" alt="Logo" class="w-24 mx-auto mb-6">
+        <h2 class="text-3xl font-bold text-slate-800 mb-2">Examen Finalizado</h2>
+        <p class="text-slate-500 mb-8"><span id="final-student-name" class="font-bold text-blue-700"></span>, estos son tus resultados:</p>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="bg-slate-50 p-6 rounded-3xl border-2 border-slate-100">
+                <p class="text-slate-400 font-bold uppercase text-[10px] mb-1">Total Aciertos</p>
+                <p class="text-3xl font-bold text-slate-700" id="final-score">0/0</p>
+            </div>
+            <div class="bg-blue-700 p-6 rounded-3xl text-white shadow-xl">
+                <p class="text-blue-200 font-bold uppercase text-[10px] mb-1">Calificación</p>
+                <p class="text-5xl font-black" id="final-grade">0</p>
+            </div>
+        </div>
+        
+        <div class="bg-slate-100 p-4 rounded-2xl mb-8 flex items-center justify-center gap-3">
+            <span class="text-2xl">⏱️</span>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase leading-none mb-1">Tiempo empleado</p>
+                <p class="text-xl font-black text-slate-700"><span id="final-time">0</span> segundos</p>
+            </div>
+        </div>
+
+        <button onclick="backToMenu()" class="w-full bg-blue-700 text-white font-bold py-4 rounded-xl hover:bg-blue-800 transition-all shadow-lg">Volver al menú</button>
+    </div>
+
+    <!-- PANTALLA 5: LOGRO GLOBAL -->
+    <div id="master-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-blue-900/60 backdrop-blur-md overflow-y-auto">
+        <div class="glass max-w-3xl w-full overflow-hidden relative shadow-2xl my-auto">
+            <div class="relative w-full">
+                <img src="https://raw.githubusercontent.com/Javithrasher/imagenesysonidos/refs/heads/main/Your%20paragraph%20text.jpg" alt="Logro Maestro" class="w-full h-auto block">
+                <div class="master-content-container">
+                    <span id="master-student-name" class="master-name text-3xl sm:text-4xl md:text-5xl lg:text-6xl">Nombre</span>
+                    <span class="master-continent-tag text-[12px] sm:text-sm md:text-base lg:text-lg">¡LO CONSEGUISTE!</span>
+                </div>
+            </div>
+            
+            <div class="p-8 text-center bg-white border-t border-slate-100">
+                <h2 class="text-3xl font-black text-blue-900 mb-2 uppercase tracking-tight">¡MAESTRO GEÓGRAFO!</h2>
+                <p class="text-slate-600 mb-6 text-lg">Has completado todos los continentes sin fallos.</p>
+                
+                <button onclick="location.reload()" class="bg-blue-700 text-white px-10 py-4 rounded-full font-bold text-xl hover:bg-blue-800 transition-all shadow-xl hover:scale-105 transform">
+                    Finalizar examen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration, volume = 0.1) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        const sounds = {
+            click: () => playTone(600, 'sine', 0.1, 0.05),
+            correct: () => { playTone(523.25, 'sine', 0.2, 0.1); setTimeout(() => playTone(659.25, 'sine', 0.3, 0.1), 100); },
+            wrong: () => playTone(220, 'triangle', 0.3, 0.1),
+            victory: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.4, 0.05), i * 150)); },
+            superVictory: () => { [523, 587, 659, 698, 783, 880, 987, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.3, 0.1), i * 100)); }
+        };
+
+        const database = {
+            "Europa": [
+                { país: "Albania", capital: "Tirana" }, { país: "Alemania", capital: "Berlín" }, { país: "Austria", capital: "Viena" }, { país: "Bélgica", capital: "Bruselas" }, { país: "Bielorrusia", capital: "Minsk" }, { país: "Bosnia-Herzegovina", capital: "Sarajevo" }, { país: "Bulgaria", capital: "Sofía" }, { país: "Chipre", capital: "Nicosia" }, { país: "Croacia", capital: "Zagreb" }, { país: "Dinamarca", capital: "Copenhague" }, { país: "Eslovaquia", capital: "Bratislava" }, { país: "Eslovenia", capital: "Liubliana" }, { país: "España", capital: "Madrid" }, { país: "Estonia", capital: "Tallin" }, { país: "Finlandia", capital: "Helsinki" }, { país: "Francia", capital: "París" }, { país: "Grecia", capital: "Atenas" }, { país: "Hungría", capital: "Budapest" }, { país: "Irlanda", capital: "Dublín" }, { país: "Islandia", capital: "Reikiavik" }, { país: "Italia", capital: "Roma" }, { país: "Letonia", capital: "Riga" }, { país: "Lituania", capital: "Vilna" }, { país: "Luxemburgo", capital: "Luxemburgo" }, { país: "Malta", capital: "La Valeta" }, { país: "Moldavia", capital: "Chisinau" }, { país: "Montenegro", capital: "Podgorica" }, { país: "Noruega", capital: "Oslo" }, { país: "Países Bajos", capital: "Ámsterdam" }, { país: "Polonia", capital: "Varsovia" }, { país: "Portugal", capital: "Lisboa" }, { país: "Reino Unido", capital: "Londres" }, { país: "República Checa", capital: "Praga" }, { país: "Rumania", capital: "Bucarest" }, { país: "Rusia", capital: "Moscú" }, { país: "Serbia", capital: "Belgrado" }, { país: "Suecia", capital: "Estocolmo" }, { país: "Suiza", capital: "Berna" }, { país: "Ucrania", capital: "Kiev" }
+            ],
+            "América": [
+                { país: "Argentina", capital: "Buenos Aires" }, { país: "Bolivia", capital: "Sucre" }, { país: "Brasil", capital: "Brasilia" }, { país: "Canadá", capital: "Ottawa" }, { país: "Chile", capital: "Santiago" }, { país: "Colombia", capital: "Bogotá" }, { país: "Costa Rica", capital: "San José" }, { país: "Cuba", capital: "La Habana" }, { país: "Ecuador", capital: "Quito" }, { país: "El Salvador", capital: "San Salvador" }, { país: "Estados Unidos", capital: "Washington D. C." }, { país: "Guatemala", capital: "Guatemala" }, { país: "Guyana", capital: "Georgetown" }, { país: "Haití", capital: "Puerto Príncipe" }, { país: "Honduras", capital: "Tegucigalpa" }, { país: "Jamaica", capital: "Kingston" }, { país: "México", capital: "México" }, { país: "Nicaragua", capital: "Managua" }, { país: "Panamá", capital: "Panamá" }, { país: "Paraguay", capital: "Asunción" }, { país: "Perú", capital: "Lima" }, { país: "República Dominicana", capital: "Santo Domingo" }, { país: "Surinam", capital: "Paramaribo" }, { país: "Uruguay", capital: "Montevideo" }, { país: "Venezuela", capital: "Caracas" }
+            ],
+            "África": [
+                { país: "Argelia", capital: "Argel" }, { país: "Camerún", capital: "Yaundé" }, { país: "Congo", capital: "Brazzaville" }, { país: "Egipto", capital: "El Cairo" }, { país: "Etiopía", capital: "Adís Abeba" }, { país: "Guinea Ecuatorial", capital: "Malabo" }, { país: "Kenia", capital: "Nairobi" }, { país: "Libia", capital: "Trípoli" }, { país: "Madagascar", capital: "Antananarivo" }, { país: "Marruecos", capital: "Rabat" }, { país: "Mauritania", capital: "Nuakchot" }, { país: "Rep. Dem. del Congo", capital: "Kinsasa" }, { país: "Senegal", capital: "Dakar" }, { país: "Sudáfrica", capital: "Pretoria" }, { país: "Túnez", capital: "Túnez" }
+            ],
+            "Asia": [
+                { país: "Afganistán", capital: "Kabul" }, { país: "Arabia Saudita", capital: "Riad" }, { país: "Catar", capital: "Doha" }, { país: "China", capital: "Pekín" }, { país: "Corea del Norte", capital: "Pionyang" }, { país: "Corea del Sur", capital: "Seúl" }, { país: "Emiratos Árabes Unidos", capital: "Abu Dabi" }, { país: "Filipinas", capital: "Manila" }, { país: "India", capital: "Nueva Delhi" }, { país: "Indonesia", capital: "Yakarta" }, { país: "Irak", capital: "Bagdad" }, { país: "Irán", capital: "Teherán" }, { país: "Israel", capital: "Jerusalén" }, { país: "Japón", capital: "Tokio" }, { país: "Líbano", capital: "Beirut" }, { país: "Malasia", capital: "Kuala Lumpur" }, { país: "Mongolia", capital: "Ulán Bator" }, { país: "Nepal", capital: "Katmandú" }, { país: "Pakistán", capital: "Islamabad" }, { país: "Singapur", capital: "Singapur" }, { país: "Siria", capital: "Damasco" }, { país: "Tailandia", capital: "Bangkok" }, { país: "Taiwán", capital: "Taipéi" }, { país: "Turquía", capital: "Ankara" }, { país: "Vietnam", capital: "Hanói" }
+            ],
+            "Oceanía": [
+                { país: "Australia", capital: "Canberra" }, { país: "Nueva Zelanda", capital: "Wellington" }
+            ]
+        };
+
+        let studentName = "";
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let continentSelected = "";
+        let masterStatus = { "Europa": false, "América": false, "África": false, "Asia": false, "Oceanía": false };
+        let startTime = 0;
+        let totalTime = 0;
+
+        function startApp() {
+            sounds.click();
+            const input = document.getElementById('student-name');
+            if (input.value.trim().length < 2) return;
+            studentName = input.value.trim();
+            document.getElementById('display-name').textContent = studentName;
+            updateSelectionScreen();
+            showScreen('selection-screen');
+        }
+
+        function updateSelectionScreen() {
+            const dotsContainer = document.getElementById('master-progress-dots');
+            dotsContainer.innerHTML = '';
+            Object.keys(masterStatus).forEach(cont => {
+                const dot = document.createElement('div');
+                dot.className = `w-4 h-4 rounded-full border-2 ${masterStatus[cont] ? 'bg-blue-600 border-blue-600 shadow-md' : 'bg-white border-slate-200'}`;
+                dotsContainer.appendChild(dot);
+                const btn = document.getElementById(`btn-${cont}`);
+                if (masterStatus[cont]) {
+                    btn.classList.add('bg-blue-50', 'border-blue-200');
+                    if (!btn.querySelector('.check-mark')) btn.innerHTML += `<span class="check-mark absolute top-2 right-2 text-blue-600">★</span>`;
+                }
+            });
+        }
+
+        function showWelcome() { sounds.click(); showScreen('welcome-screen'); }
+
+        function startGame(continent) {
+            sounds.click();
+            continentSelected = continent;
+            currentQuestions = [...database[continent]].sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            score = 0;
+            startTime = Date.now(); // Iniciamos cronómetro
+            document.getElementById('game-continent').textContent = continent;
+            document.getElementById('score').textContent = "0";
+            showScreen('game-screen');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const currentItem = currentQuestions[currentIndex];
+            document.getElementById('feedback').className = "hidden";
+            document.getElementById('progress-text').textContent = `Pregunta ${currentIndex + 1} de ${currentQuestions.length}`;
+            document.getElementById('country-display').textContent = currentItem.país;
+
+            let options = [currentItem.capital];
+            let continentPool = database[continentSelected].filter(i => i.capital !== currentItem.capital).map(i => i.capital).sort(() => Math.random() - 0.5).slice(0, 3);
+            if (options.length + continentPool.length < 4) {
+                const globalPool = Object.values(database).flat().filter(i => i.capital !== currentItem.capital).map(i => i.capital);
+                while (options.length + continentPool.length < 4) {
+                    let rand = globalPool[Math.floor(Math.random() * globalPool.length)];
+                    if(!continentPool.includes(rand)) continentPool.push(rand);
+                }
+            }
+            options = options.concat(continentPool).sort(() => Math.random() - 0.5);
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn p-5 text-center bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-700 shadow-sm";
+                btn.textContent = opt;
+                btn.onclick = () => handleSelection(opt, currentItem.capital, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleSelection(selected, correct, btn) {
+            const buttons = document.querySelectorAll('#options-container button');
+            buttons.forEach(b => b.disabled = true);
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden');
+            if (selected === correct) {
+                sounds.correct(); score++;
+                document.getElementById('score').textContent = score;
+                btn.classList.add('bg-green-50', 'text-green-700', 'border-green-500');
+                feedback.innerHTML = `<span class="text-green-600">¡Correcto, ${studentName}! ✅</span>`;
+            } else {
+                sounds.wrong();
+                btn.classList.add('bg-red-50', 'text-red-700', 'border-red-500');
+                feedback.innerHTML = `<span class="text-red-600">Incorrecto. La capital es ${correct}. ❌</span>`;
+                buttons.forEach(b => { if (b.textContent === correct) b.classList.add('border-green-500', 'bg-green-50'); });
+            }
+            setTimeout(() => { 
+                currentIndex++; 
+                if (currentIndex < currentQuestions.length) renderQuestion(); 
+                else showFinalScreen(); 
+            }, 1800);
+        }
+
+        function showFinalScreen() {
+            totalTime = Math.floor((Date.now() - startTime) / 1000); // Segundos totales
+            const total = currentQuestions.length;
+            const isPerfect = (score === total);
+            if (isPerfect) masterStatus[continentSelected] = true;
+            
+            const allMaster = Object.values(masterStatus).every(v => v === true);
+            
+            if (allMaster && isPerfect) { 
+                showMasterScreen(); 
+                return; 
+            }
+
+            sounds.victory();
+            document.getElementById('final-student-name').textContent = studentName;
+            document.getElementById('final-score').textContent = `${score} / ${total}`;
+            document.getElementById('final-time').textContent = totalTime;
+            const nota = (score / total) * 10;
+            document.getElementById('final-grade').textContent = nota.toFixed(1);
+            showScreen('final-screen');
+        }
+
+        function showMasterScreen() {
+            sounds.superVictory();
+            document.getElementById('master-student-name').textContent = studentName;
+            showScreen('master-screen');
+        }
+
+        function backToMenu() { 
+            sounds.click(); 
+            updateSelectionScreen(); 
+            showScreen('selection-screen'); 
+        }
+
+        function showScreen(id) {
+            ['welcome-screen', 'selection-screen', 'game-screen', 'final-screen', 'master-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
